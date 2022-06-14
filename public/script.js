@@ -96,6 +96,8 @@ text.addEventListener("keydown", (e) => {
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
+const shareScreen = document.querySelector("#screenShare");
+
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
@@ -131,6 +133,25 @@ inviteButton.addEventListener("click", (e) => {
     "Copy this link and send it to people you want to meet with",
     window.location.href
   );
+});
+
+shareScreen.addEventListener("click", () => {
+  try{
+    const constraints = {
+        video: {
+            cursor: 'always',
+            displaySurface: 'window',
+        },
+        audio: false
+    };
+    const Screen =  await navigator.mediaDevices.getDisplayMedia(constraints);
+    connectToNewUser(userId, Screen);
+        //const sharedscreen = document.querySelector('video#ShareVideo');
+    //sharedscreen.srcObject = Screen;
+
+}catch(error){
+    console.error('Error Capturing Screen', error);
+}
 });
 
 socket.on("createMessage", (message, userName) => {
