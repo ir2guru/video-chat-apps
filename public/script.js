@@ -216,7 +216,7 @@ console.log(timer_counter);
 setInterval(time , how_quick)
 
 function time(){ 
-if (timer_counter != 65) {
+if (timer_counter != 1800) {
 timer_counter++;
   document.getElementById("t").innerHTML =  (timer_counter/60).toFixed(2);
 console.log(timer_counter);
