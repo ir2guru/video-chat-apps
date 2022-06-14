@@ -23,11 +23,12 @@ const user = prompt("Enter your name");
 
 var peer = new Peer(
   {config: {'iceServers': [
-    {url:'stun:stun.netsend.pw:19302'},
+    {url:'stun.l.google.com:19302'},
+    {url:'stun1.l.google.com:19302'},
     {
-      url: 'turn:turn.netsend.pw',
-      credential: 'Ejikerichard234@',
-      username: 'ejikerichard'
+      url: 'turn:192.158.29.39:3478?transport=tcp',
+      credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+      username: '28224511:1379330808'
     }
   ]}
 });
