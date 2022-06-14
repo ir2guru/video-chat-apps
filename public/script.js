@@ -31,8 +31,15 @@ var peer = new Peer(
     }
   ]}
 });
-
+let streamingScreen = false;
 let myVideoStream;
+let ScreenStream;
+let currentCall;
+
+var timer_counter = 0;
+var how_quick = 1000;
+document.getElementById("t").innerHTML = timer_counter;
+
 navigator.mediaDevices
   .getUserMedia({
     audio: true,
@@ -48,6 +55,7 @@ navigator.mediaDevices
       call.on("stream", (userVideoStream) => {
         addVideoStream(video, userVideoStream);
       });
+      currentCall = call;
     });
 
     socket.on("user-connected", (userId) => {
@@ -61,6 +69,7 @@ const connectToNewUser = (userId, stream) => {
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
   });
+  currentCall = call;
 };
 
 peer.on("open", (id) => {
@@ -96,7 +105,8 @@ text.addEventListener("keydown", (e) => {
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
-const shareScreen = document.querySelector("#screenShare");
+const shareCreen = document.querySelector("#screenShare");
+const endCall = document.querySelector("#endCall");
 
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
@@ -135,24 +145,88 @@ inviteButton.addEventListener("click", (e) => {
   );
 });
 
-shareScreen.addEventListener("click", () => {
-  try{
-    const constraints = {
-        video: {
-            cursor: 'always',
-            displaySurface: 'window',
-        },
-        audio: false
-    };
-    const Screen =  await navigator.mediaDevices.getDisplayMedia(constraints);
-    connectToNewUser(userId, Screen);
-        //const sharedscreen = document.querySelector('video#ShareVideo');
-    //sharedscreen.srcObject = Screen;
-
-}catch(error){
-    console.error('Error Capturing Screen', error);
+function endStreamCall(){
+  location.replace('https://www.javascripttutorial.net/?');
 }
+
+endCall.addEventListener("click", (e) => {
+  console.log("Connection Status :", peer.disconnected);
+  console.log("Connection Status :", peer.disconnected);
+  location.replace('https://www.javascripttutorial.net/');
 });
+
+shareCreen.addEventListener("click", (e) => {
+  if(streamingScreen == false){
+    navigator.mediaDevices
+    .getDisplayMedia({
+      video: {
+        cursor: 'always',
+        displaySurface: 'window',
+    },
+      audio: true
+    })
+    .then((stream) => {
+      ScreenStream = stream;
+      addVideoStream(myVideo, stream);
+  
+      peer.on("call", (call) => {
+        call.answer(stream);
+        const video = document.createElement("video");
+        call.on("stream", (userVideoStream) => {
+          addVideoStream(video, userVideoStream);
+        });
+      });
+  
+      socket.on("user-connected", (userId) => {
+        connectToNewUser(userId, stream);
+      });
+    });
+    streamingScreen = true;
+    console.log("Streaming Screen Status", streamingScreen);
+  }else{
+    navigator.mediaDevices
+  .getUserMedia({
+    audio: true,
+    video: true,
+  })
+  .then((stream) => {
+    myVideoStream = stream;
+    addVideoStream(myVideo, stream);
+
+    peer.on("call", (call) => {
+      call.answer(stream);
+      const video = document.createElement("video");
+      call.on("stream", (userVideoStream) => {
+        addVideoStream(video, userVideoStream);
+      });
+    });
+
+    socket.on("user-connected", (userId) => {
+      connectToNewUser(userId, stream);
+    });
+  });
+  streamingScreen = false;
+  console.log("Streaming Screen Status", streamingScreen);
+  }
+  
+});
+
+console.log(timer_counter);
+
+setInterval(time , how_quick)
+
+function time(){ 
+if (timer_counter != 65) {
+timer_counter++;
+  document.getElementById("t").innerHTML =  (timer_counter/60).toFixed(2);
+console.log(timer_counter);
+}
+  
+else {
+  endStreamCall();
+}
+}
+
 
 socket.on("createMessage", (message, userName) => {
   messages.innerHTML =
